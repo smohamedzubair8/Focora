@@ -103,7 +103,10 @@ export const Navbar: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() => signOut()}
+                  onClick={async () => {
+                    await signOut();
+                    navigate('/auth', { replace: true });
+                  }}
                   className="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors font-medium"
                 >
                   <LogOut className="w-3.5 h-3.5" />

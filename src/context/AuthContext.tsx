@@ -31,12 +31,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isConfigured = isSupabaseConfigured();
 
   useEffect(() => {
+    // 1. Wipe any old demo user from localStorage immediately
+    try {
+      const stored = localStorage.getItem(LOCAL_USER_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.id === 'demo-user' || parsed?.email?.includes('elena.vance') || !parsed?.email) {
+          localStorage.removeItem(LOCAL_USER_KEY);
+        }
+      }
+    } catch {
+      localStorage.removeItem(LOCAL_USER_KEY);
+    }
+
     if (!isConfigured) {
-      // Local fallback auth: only load if user previously signed in on this device
+      // Local fallback auth: only load if user previously signed in with a custom account
       const savedUser = localStorage.getItem(LOCAL_USER_KEY);
       if (savedUser) {
         try {
-          setUser(JSON.parse(savedUser));
+          const parsed = JSON.parse(savedUser);
+          if (parsed && parsed.id !== 'demo-user' && !parsed?.email?.includes('elena.vance')) {
+            setUser(parsed);
+          } else {
+            setUser(null);
+            localStorage.removeItem(LOCAL_USER_KEY);
+          }
         } catch {
           setUser(null);
           localStorage.removeItem(LOCAL_USER_KEY);
@@ -131,14 +150,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    if (!isConfigured) {
-      localStorage.removeItem(LOCAL_USER_KEY);
-      setUser(null);
-      return;
-    }
-    await supabase.auth.signOut();
+    localStorage.removeItem(LOCAL_USER_KEY);
     setUser(null);
     setSession(null);
+    if (isConfigured) {
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        console.warn('Sign out notice:', err);
+      }
+    }
   };
 
   const signInAsDemo = () => {
@@ -147,8 +168,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email: 'elena.vance@example.com',
       name: 'Elena Vance',
     };
+    // Kept in memory only for testing this session; not stored in localStorage
     setUser(defaultUser);
-    localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultUser));
   };
 
   return (
