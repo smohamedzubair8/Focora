@@ -32,30 +32,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (!isConfigured) {
-      // Local fallback auth
+      // Local fallback auth: only load if user previously signed in on this device
       const savedUser = localStorage.getItem(LOCAL_USER_KEY);
       if (savedUser) {
         try {
           setUser(JSON.parse(savedUser));
         } catch {
-          // Default demo user matching Figma design
-          const defaultUser: AuthUser = {
-            id: 'demo-user',
-            email: 'elena.vance@example.com',
-            name: 'Elena Vance',
-          };
-          setUser(defaultUser);
-          localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultUser));
+          setUser(null);
+          localStorage.removeItem(LOCAL_USER_KEY);
         }
       } else {
-        // Default to Elena Vance from Figma design for seamless immediate preview
-        const defaultUser: AuthUser = {
-          id: 'demo-user',
-          email: 'elena.vance@example.com',
-          name: 'Elena Vance',
-        };
-        setUser(defaultUser);
-        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(defaultUser));
+        // Do NOT auto-login as demo user. Keep as null so user is directed to Login / Sign Up!
+        setUser(null);
       }
       setLoading(false);
       return;

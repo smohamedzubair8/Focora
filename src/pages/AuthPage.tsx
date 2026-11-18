@@ -5,8 +5,15 @@ import { Logo } from '../components/common/Logo';
 import { useAuth } from '../context/AuthContext';
 
 export const AuthPage: React.FC = () => {
-  const { signIn, signUp, signInAsDemo, isConfigured } = useAuth();
+  const { user, signIn, signUp, signInAsDemo, isConfigured } = useAuth();
   const navigate = useNavigate();
+
+  // If already logged in, redirect to Overview
+  React.useEffect(() => {
+    if (user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
