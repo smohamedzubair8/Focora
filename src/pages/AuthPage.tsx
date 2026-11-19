@@ -41,14 +41,26 @@ export const AuthPage: React.FC = () => {
       if (isSignUp) {
         const { error: signUpErr } = await signUp(email.trim(), password, name.trim());
         if (signUpErr) {
-          setError(signUpErr.message);
-        } else {
-          if (isConfigured) {
-            setSignUpSuccessMessage(
-              'Account created! Check your email inbox to confirm your registration, or sign in now.'
-            );
+          if (signUpErr.message.toLowerCase().includes('rate limit')) {
+            // Attempt direct sign in in case user was already created on the first attempt
+            const { error: signInErr } = await signIn(email.trim(), password);
+            if (!signInErr) {
+              navigate('/overview');
+              return;
+            }
+            setError('Email rate limit exceeded. Your account was likely already created — click "Sign In" below to log in, or turn off "Confirm email" in your Supabase Auth settings.');
           } else {
+            setError(signUpErr.message);
+          }
+        } else {
+          // If Supabase created the user, attempt instant sign in
+          const { error: autoSignInErr } = await signIn(email.trim(), password);
+          if (!autoSignInErr) {
             navigate('/overview');
+          } else {
+            setSignUpSuccessMessage(
+              'Account created! You can now click "Sign In" below to enter your workspace.'
+            );
           }
         }
       } else {
