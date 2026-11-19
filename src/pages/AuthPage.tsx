@@ -8,13 +8,6 @@ export const AuthPage: React.FC = () => {
   const { user, signIn, signUp, signInAsDemo, isConfigured } = useAuth();
   const navigate = useNavigate();
 
-  // If already logged in, redirect to Overview
-  React.useEffect(() => {
-    if (user) {
-      navigate('/', { replace: true });
-    }
-  }, [user, navigate]);
-
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -55,7 +48,7 @@ export const AuthPage: React.FC = () => {
               'Account created! Check your email inbox to confirm your registration, or sign in now.'
             );
           } else {
-            navigate('/');
+            navigate('/overview');
           }
         }
       } else {
@@ -63,7 +56,7 @@ export const AuthPage: React.FC = () => {
         if (signInErr) {
           setError(signInErr.message);
         } else {
-          navigate('/');
+          navigate('/overview');
         }
       }
     } catch (err: any) {
@@ -75,7 +68,7 @@ export const AuthPage: React.FC = () => {
 
   const handleDemoLogin = () => {
     signInAsDemo();
-    navigate('/');
+    navigate('/overview');
   };
 
   return (
@@ -168,6 +161,31 @@ export const AuthPage: React.FC = () => {
         {/* Right Side: Form */}
         <div className="lg:col-span-7 p-8 sm:p-12 lg:p-14 flex flex-col justify-center">
           <div className="max-w-md w-full mx-auto space-y-6">
+            {/* If user already has an active session, show a shortcut to enter directly */}
+            {user && (
+              <div className="p-4 bg-blue-50/90 border border-blue-200 rounded-2xl flex items-center justify-between gap-3 shadow-sm animate-in fade-in">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 text-xs shadow-sm">
+                    {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-800 truncate">
+                      Signed in as {user.name || user.email}
+                    </p>
+                    <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/overview')}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shrink-0 transition-colors shadow-sm shadow-blue-500/20 flex items-center gap-1.5"
+                >
+                  <span>Enter Workspace</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 {isSignUp ? 'Create your workspace' : 'Welcome back'}

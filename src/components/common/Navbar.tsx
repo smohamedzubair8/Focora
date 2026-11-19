@@ -29,12 +29,12 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Left: Brand & Nav Links */}
         <div className="flex items-center gap-8">
-          <NavLink to="/" className="focus:outline-none">
+          <NavLink to="/overview" className="focus:outline-none">
             <Logo />
           </NavLink>
 
           <nav className="hidden md:flex items-center space-x-1.5 bg-slate-100/70 p-1 rounded-full border border-slate-200/60">
-            <NavLink to="/" end className={navLinkClasses}>
+            <NavLink to="/overview" end className={navLinkClasses}>
               Overview
             </NavLink>
             <NavLink to="/goals" className={navLinkClasses}>
@@ -120,7 +120,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile nav pills */}
       <div className="flex md:hidden px-4 pb-2.5 overflow-x-auto space-x-1.5 scrollbar-none">
-        <NavLink to="/" end className={navLinkClasses}>
+        <NavLink to="/overview" end className={navLinkClasses}>
           Overview
         </NavLink>
         <NavLink to="/goals" className={navLinkClasses}>

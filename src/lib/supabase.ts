@@ -1,24 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// Default to live project credentials, with environment variable override if provided
+const DEFAULT_SUPABASE_URL = 'https://lxdnejwluksrodnmavag.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_SaIvlN4C_fftAhRmczVNmA_kEcr_l5d';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = (): boolean => {
   return (
     Boolean(supabaseUrl) &&
     Boolean(supabaseAnonKey) &&
-    !supabaseUrl.includes('your-project-id') &&
+    !supabaseUrl.includes('placeholder') &&
     supabaseUrl.startsWith('https://')
   );
 };
 
-// Fallback dummy client if not configured yet, preventing app initialization crash
-const dummyUrl = 'https://placeholder-project.supabase.co';
-const dummyKey = 'placeholder-anon-key';
-
 export const supabase = createClient(
-  isSupabaseConfigured() ? supabaseUrl : dummyUrl,
-  isSupabaseConfigured() ? supabaseAnonKey : dummyKey,
+  supabaseUrl,
+  supabaseAnonKey,
   {
     auth: {
       persistSession: true,
